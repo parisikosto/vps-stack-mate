@@ -1,2 +1,3 @@
 # vps-stack-mate
-Easy VPS Deployment tool with Nginx Reverse Proxy, SSL, and Docker Compose services
+
+> A Bash CLI for deploying Docker Compose services on a VPS with NGINX reverse proxy and automatic Let's Encrypt SSL
