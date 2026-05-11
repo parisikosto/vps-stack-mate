@@ -2,5 +2,9 @@
 .env
 domains.json
 
+# created at runtime by the stack
+certbot/
+nginx/conf.d/
+
 # misc
 .DS_Store
