@@ -17,7 +17,9 @@ source utils/logger.sh
 USAGE="$(cat <<'EOF'
 Usage: ./mate.sh <command>
 
-  generate-env-file   Generate .env
+  generate-env-file       Generate .env
+  generate-domains-file   Generate a placeholder domains.json
+  generate-config-files   Run both generate commands above
 
 Options:
   -h, --help    Show this help
@@ -35,6 +37,15 @@ case "$CMD" in
 
   generate-env-file)
     bash scripts/generate/env-file.sh "${@:2}"
+    ;;
+
+  generate-domains-file)
+    bash scripts/generate/domains-file.sh "${@:2}"
+    ;;
+
+  generate-config-files)
+    bash scripts/generate/env-file.sh "${@:2}"
+    bash scripts/generate/domains-file.sh "${@:2}"
     ;;
 
   *)

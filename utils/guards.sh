@@ -23,3 +23,16 @@ function guard_require_root() {
     exit 1
   fi
 }
+
+# ─── .env guard ───────────────────────────────────────────────────────────────
+#
+# The .env file must exist before scripts that need service names,
+# paths, or Certbot settings can do anything useful.
+#
+function guard_require_env() {
+  if [[ ! -f ".env" ]]; then
+    log_err "The file '.env' does not exist."
+    log_info "Please run './mate.sh generate-env-file' command first."
+    exit 1
+  fi
+}
