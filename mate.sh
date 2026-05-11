@@ -21,6 +21,8 @@ Usage: ./mate.sh <command>
   generate-domains-file   Generate a placeholder domains.json
   generate-config-files   Run both generate commands above
 
+  deploy-services         Start the Docker Compose stack
+
 Options:
   -h, --help    Show this help
 EOF
@@ -46,6 +48,10 @@ case "$CMD" in
   generate-config-files)
     bash scripts/generate/env-file.sh "${@:2}"
     bash scripts/generate/domains-file.sh "${@:2}"
+    ;;
+
+  deploy-services)
+    bash scripts/deploy/services.sh "${@:2}"
     ;;
 
   *)

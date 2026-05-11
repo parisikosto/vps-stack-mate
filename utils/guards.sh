@@ -24,6 +24,26 @@ function guard_require_root() {
   fi
 }
 
+# ─── Docker guard ─────────────────────────────────────────────────────────────
+#
+# Checks for the docker binary and the Compose v2 plugin separately.
+# Compose v2 ships as a plugin ('docker compose') not as a standalone
+# binary ('docker-compose'), so we test both explicitly.
+#
+function guard_require_docker() {
+  if ! command -v docker &>/dev/null; then
+    log_err "Docker is not installed."
+    log_info "Install it: https://docs.docker.com/engine/install/"
+    exit 1
+  fi
+
+  if ! docker compose version &>/dev/null; then
+    log_err "Docker Compose v2 plugin is not installed."
+    log_info "Install it: https://docs.docker.com/compose/install/"
+    exit 1
+  fi
+}
+
 # ─── .env guard ───────────────────────────────────────────────────────────────
 #
 # The .env file must exist before scripts that need service names,
