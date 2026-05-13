@@ -28,6 +28,7 @@ _CYAN="\033[96m"
 #   DECISION  about to ask the user a question
 #   SUCCESS   operation completed successfully
 #   ERROR     something failed
+#   WARN      not a failure, but the user should notice
 #   INFO      neutral informational message
 #
 function logger() {
@@ -40,6 +41,7 @@ function logger() {
     DECISION) color="${_YELLOW}"        ;;
     SUCCESS)  color="${_GREEN}"         ;;
     ERROR)    color="${_RED}"           ;;
+    WARN)     color="${_YELLOW}"        ;;
     INFO)     color="${_GRAY}"          ;;
     *)        color="${_RESET}"         ;;
   esac
@@ -48,6 +50,7 @@ function logger() {
 }
 
 # ─── Short wrappers ───────────────────────────────────────────────────────────
-log_ok()   { logger SUCCESS "✔ $*"; }
-log_err()  { logger ERROR   "✖ $*"; }
+log_ok()   { logger SUCCESS "✔  $*"; }
+log_err()  { logger ERROR   "✖  $*"; }
+log_warn() { logger WARN    "⚠  $*"; }
 log_info() { logger INFO    "$*"; }
