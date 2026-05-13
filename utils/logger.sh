@@ -14,17 +14,18 @@
 
 # ─── ANSI color codes ─────────────────────────────────────────────────────────
 _RESET="\033[0m"
-_BOLD="\033[1m"
 
 _GRAY="\033[90m"
-_RED="\033[91m"
-_GREEN="\033[92m"
+_GREEN="\033[32m"
+_MAGENTA="\033[35m"
+_RED="\033[31m"
 _YELLOW="\033[93m"
-_CYAN="\033[96m"
+_LIGHT_CYAN="\033[96m"
 
 # ─── logger <LEVEL> "message" ─────────────────────────────────────────────────
 #
 #   CMD       top-level command is starting
+#   SUB_CMD   a sub-step inside a command
 #   DECISION  about to ask the user a question
 #   SUCCESS   operation completed successfully
 #   ERROR     something failed
@@ -37,13 +38,14 @@ function logger() {
   local color
 
   case "$level" in
-    CMD)      color="${_BOLD}${_CYAN}"  ;;
-    DECISION) color="${_YELLOW}"        ;;
-    SUCCESS)  color="${_GREEN}"         ;;
-    ERROR)    color="${_RED}"           ;;
-    WARN)     color="${_YELLOW}"        ;;
-    INFO)     color="${_GRAY}"          ;;
-    *)        color="${_RESET}"         ;;
+    CMD)      color="${_LIGHT_CYAN}"  ;;
+    SUB_CMD)  color="${_MAGENTA}"     ;;
+    DECISION) color="${_YELLOW}"      ;;
+    SUCCESS)  color="${_GREEN}"       ;;
+    ERROR)    color="${_RED}"         ;;
+    WARN)     color="${_YELLOW}"      ;;
+    INFO)     color="${_GRAY}"        ;;
+    *)        color="${_RESET}"       ;;
   esac
 
   echo -e "${color}${message}${_RESET}"
