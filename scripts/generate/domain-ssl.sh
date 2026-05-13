@@ -39,7 +39,7 @@ function provision_domain_ssl() {
   mkdir -p "$CERTBOT_SERVICE_DATA_DIR/conf/live/$domain"
 
   docker compose run --rm --entrypoint \
-    "openssl req -x509 -nodes -newkey rsa:1024 -days 1 \
+    "openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
       -keyout '/etc/letsencrypt/live/$domain/privkey.pem' \
       -out    '/etc/letsencrypt/live/$domain/fullchain.pem' \
       -subj   '/CN=localhost'" \
@@ -48,6 +48,9 @@ function provision_domain_ssl() {
   # Start nginx so it can serve the ACME challenge files.
   logger SUB_CMD "### Starting nginx..."
   docker compose up --force-recreate -d nginx
+
+  # Wait for nginx to fully initialize before certbot tries to connect.
+  sleep 5
 
   # Remove the dummy certificate before requesting the real one.
   logger SUB_CMD "### Deleting dummy certificate for '$domain'..."
