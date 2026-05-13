@@ -22,6 +22,7 @@ Usage: ./mate.sh <command>
   generate-config-files   Run both generate commands above
 
   deploy-services         Start the Docker Compose stack
+  deploy-domains          Provision SSL certs and write nginx configs
 
 Options:
   -h, --help    Show this help
@@ -52,6 +53,10 @@ case "$CMD" in
 
   deploy-services)
     bash scripts/deploy/services.sh "${@:2}"
+    ;;
+
+  deploy-domains)
+    bash scripts/deploy/domains.sh "${@:2}"
     ;;
 
   *)

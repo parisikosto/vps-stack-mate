@@ -56,3 +56,17 @@ function guard_require_env() {
     exit 1
   fi
 }
+
+# ─── domains.json guard ───────────────────────────────────────────────────────
+#
+# MATE_DOMAINS_FILE must already be set (sourced from .env) before calling this.
+#
+function guard_require_domains_file() {
+  local file="${MATE_DOMAINS_FILE:-domains.json}"
+
+  if [[ ! -f "$file" ]]; then
+    log_err "The file '$file' does not exist."
+    log_info "Please run './mate.sh generate-domains-file' command first."
+    exit 1
+  fi
+}
