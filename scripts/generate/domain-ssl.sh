@@ -2,13 +2,15 @@
 #
 # scripts/generate/domain-ssl.sh
 #
-# SSL certificate provisioning functions for a single domain.
+# SSL certificate provisioning for a single domain.
 #
 # This file only defines functions — it does NOT auto-execute.
 # Source it from deploy/domains.sh, then call:
 #   provision_domain_ssl "$domain"
 #
 # Requires: logger.sh sourced, .env sourced.
+
+# ─── TLS parameters ───────────────────────────────────────────────────────────
 
 function _download_tls_params() {
   local conf_dir="$CERTBOT_SERVICE_DATA_DIR/conf"
@@ -29,37 +31,43 @@ function _download_tls_params() {
     > "$dhparam"
 }
 
+# ─── SSL provisioning ─────────────────────────────────────────────────────────
+
 function provision_domain_ssl() {
   local domain="$1"
 
-  _download_tls_params
+  # Write a temporary HTTP-only nginx config.
+  # No SSL block — nginx does not need a certificate at this stage.
+  # This config only serves port 80 for the ACME challenge.
+  logger SUB_CMD "### Writing temporary HTTP-only nginx config for '$domain'..."
+  cat > "$NGINX_SERVICE_CONF_DIR/$domain.conf" <<NGINX_CONF
+server {
+    listen 80;
+    server_name $domain;
+    server_tokens off;
 
-  # Create a dummy certificate so nginx can start for the ACME challenge.
-  logger SUB_CMD "### Creating dummy certificate for '$domain'..."
-  mkdir -p "$CERTBOT_SERVICE_DATA_DIR/conf/live/$domain"
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
 
-  docker compose run --rm --entrypoint \
-    "openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
-      -keyout '/etc/letsencrypt/live/$domain/privkey.pem' \
-      -out    '/etc/letsencrypt/live/$domain/fullchain.pem' \
-      -subj   '/CN=localhost'" \
-    certbot
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
+}
+NGINX_CONF
 
-  # Start nginx so it can serve the ACME challenge files.
+  # Reload or start nginx with the temporary HTTP-only config.
   logger SUB_CMD "### Starting nginx..."
-  docker compose up --force-recreate -d nginx
+  if docker compose ps nginx | grep -q "running\|Running"; then
+    docker compose exec nginx nginx -s reload
+  else
+    docker compose up --force-recreate -d nginx
+  fi
 
-  # Wait for nginx to fully initialize before certbot tries to connect.
   sleep 5
 
-  # Remove the dummy certificate before requesting the real one.
-  logger SUB_CMD "### Deleting dummy certificate for '$domain'..."
-  docker compose run --rm --entrypoint \
-    "rm -Rf \
-      /etc/letsencrypt/live/$domain \
-      /etc/letsencrypt/archive/$domain \
-      /etc/letsencrypt/renewal/$domain.conf" \
-    certbot
+  # Download TLS params needed for the final SSL config.
+  _download_tls_params
 
   # Request the real Let's Encrypt certificate.
   logger SUB_CMD "### Requesting Let's Encrypt certificate for '$domain'..."
@@ -86,9 +94,6 @@ function provision_domain_ssl() {
       --agree-tos \
       --force-renewal" \
     certbot
-
-  logger SUB_CMD "### Reloading nginx..."
-  docker compose exec nginx nginx -s reload
 
   log_ok "SSL certificate issued for '$domain'."
 }
