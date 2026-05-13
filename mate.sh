@@ -25,6 +25,12 @@ Usage: ./mate.sh <command>
   deploy-domains          Provision SSL certs and write nginx configs
   deploy-stack            Full deploy: services + domains
 
+  reload-domains          Rebuild nginx configs and restart nginx
+  reload-service          Pull and recreate a single service
+  reload-stack            Redeploy all services and reload domains
+
+  clean-stack             Remove certbot/, nginx/conf.d/, .env, domains.json
+
 Options:
   -h, --help    Show this help
 EOF
@@ -63,6 +69,24 @@ case "$CMD" in
   deploy-stack)
     bash scripts/deploy/services.sh "${@:2}"
     bash scripts/deploy/domains.sh "${@:2}"
+    ;;
+
+  reload-domains)
+    bash scripts/reload/domains.sh "${@:2}"
+    ;;
+
+  reload-service)
+    bash scripts/reload/service.sh "${@:2}"
+    ;;
+
+  reload-stack)
+    bash scripts/deploy/services.sh "${@:2}"
+    bash scripts/reload/domains.sh "${@:2}"
+    ;;
+
+  clean-stack)
+    rm -rf certbot nginx/conf.d .env domains.json
+    log_ok "Stack cleaned."
     ;;
 
   *)
