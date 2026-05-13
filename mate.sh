@@ -23,6 +23,7 @@ Usage: ./mate.sh <command>
 
   deploy-services         Start the Docker Compose stack
   deploy-domains          Provision SSL certs and write nginx configs
+  deploy-stack            Full deploy: services + domains
 
 Options:
   -h, --help    Show this help
@@ -56,6 +57,11 @@ case "$CMD" in
     ;;
 
   deploy-domains)
+    bash scripts/deploy/domains.sh "${@:2}"
+    ;;
+
+  deploy-stack)
+    bash scripts/deploy/services.sh "${@:2}"
     bash scripts/deploy/domains.sh "${@:2}"
     ;;
 
